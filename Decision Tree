@@ -1,0 +1,51 @@
+library(rpart)
+
+library(rpart.plot)
+
+library(e1071)
+
+library(caret)
+
+library(ggplot2)
+
+library(pROC)
+
+data <- read.csv("~/Desktop/BANK LOAN.csv")
+
+head(data)
+
+data$DEFAULTER <- as.factor(data$DEFAULTER)
+
+str(data)
+
+set.seed(42)
+
+splitindex <- createDataPartition(data$DEFAULTER, p = 0.8, list = FALSE)
+
+train_data <- data[splitindex, ]
+
+test_data <- data[-splitindex, ]
+
+table(traindata$DEFAULTER)
+
+table(testdata$DEFAULTER)
+
+dt_model <- rpart(DEFAULTER ~ ., data=data, method = "class")
+
+print(dt_model)
+
+png("Decision tree.jpeg", width=1300, height = 968)
+
+rpart.plot(dt_model, main="Decision tree chart")
+
+dev.off()
+
+dt_prob <- predict(dt_model, testdata, type="prob")
+
+dt_pred <- ifelse(dt_prob[,2] > 0.5, 1, 0)
+
+df_pred <- as.factor(dt_pred)
+
+dt_conf_matrix <- confusionMatrix(dt_pred, testdata$DEFAULTER)
+
+dt_conf_matrix
